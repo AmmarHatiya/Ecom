@@ -11,6 +11,13 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+
+# Build paths used to be able to store/retrieve product pictures
+BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
+MEDIA_URL = '/Photos/'
+MEDIA_ROOT = os.path.join(BASE_DIR, "Photos")
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,7 +52,7 @@ INSTALLED_APPS = [
 CORS_ORIGIN_ALLOW_ALL =True
 
 MIDDLEWARE = [
-    'corsheaders',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
