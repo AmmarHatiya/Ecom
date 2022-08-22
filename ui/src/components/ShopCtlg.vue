@@ -3,19 +3,21 @@
     <v-row style="margin-top:1rem" justify="center">
       <v-dialog v-model="dialog" width="unset">
         <template v-slot:activator="{ on, attrs }">
-          <v-btn color="blue darken-4"  @click="dialog = true, addClick()" v-bind="attrs" v-on="on">
+          <v-btn color="blue darken-4" @click="dialog = true, addClick()" v-bind="attrs" v-on="on">
             Add Product
           </v-btn>
         </template>
         <v-card width="700px">
           <v-card-title>
-            <span class="text-h5">{{popupTitle}}</span>
+            <span class="text-h5">{{ popupTitle }}</span>
           </v-card-title>
           <v-card-text>
             <v-container>
               <v-form ref="form" v-model="valid" lazy-validation>
-                <v-text-field v-model="ProductName" :counter="10" :rules="nameRules" label="Name" required></v-text-field>
-                <v-text-field v-model="ProductDescription" :rules="descriptionRules" label="Product Description" required>
+                <v-text-field v-model="ProductName" :counter="10" :rules="nameRules" label="Name" required>
+                </v-text-field>
+                <v-text-field v-model="ProductDescription" :rules="descriptionRules" label="Product Description"
+                  required>
                 </v-text-field>
                 <v-text-field v-model="ProductPrice" :rules="PriceRules" label="Price" required></v-text-field>
                 <v-file-input v-model="ProductPhotoFileName" accept="image/*" label="Picture"></v-file-input>
@@ -26,10 +28,10 @@
           <v-card-actions>
 
             <v-spacer></v-spacer>
-            <v-btn v-if="ProductID==0" color="blue darken -4" text @click="dialog = false">
+            <v-btn v-if="ProductID == 0" color="blue darken -4" text @click="dialog = false, creationClick()">
               Add Product
             </v-btn>
-            <v-btn v-if="ProductID!=0" color="blue darken -4" text @click="dialog = false">
+            <v-btn v-if="ProductID != 0" color="blue darken -4" text @click="dialog = false, updateClick()">
               Update Product
             </v-btn>
           </v-card-actions>
@@ -46,9 +48,12 @@
         Description: {{ prod.ProductDescription }}
         PhotoFileName: {{ prod.PhotoFileName }}
         .....
-          <v-btn color="blue darken-4"  @click="dialog = true, editClick(prod)" rounded v-bind="attrs" v-on="on">
-            Edit <v-icon >mdi-pencil-outline</v-icon>
-          </v-btn>
+        <v-btn color="blue darken-4" @click="dialog = true, editClick(prod)" rounded v-bind="attrs" v-on="on">
+          Edit <v-icon>mdi-pencil-outline</v-icon>
+        </v-btn>
+        <v-btn color="blue darken-4" @click="deleteClick(prod.ProductID)" rounded>
+          Delete <v-icon>mdi-trash-can-outline</v-icon>
+        </v-btn>
 
       </v-card>
     </v-container>
@@ -120,15 +125,62 @@ export default {
           this.products = response.data;
         });
     },
-    addClick(){
-      this.popupTitle="Create a New Product";
+    addClick() {
+      this.popupTitle = "Create a New Product";
       this.ProductID = 0;
       this.ProductName = "";
+      this.ProductDescription = "";
+      this.ProductPrice = "";
+      /**ADD PHOTOFILENAME */
+
     },
-    editClick(entry){
-      this.popupTitle="Update Product";
+    editClick(entry) {
+      this.popupTitle = "Update Product";
       this.ProductID = entry.ProductID;
       this.ProductName = entry.ProductName;
+      this.ProductPrice = entry.Price;
+      this.ProductDescription = entry.ProductDescription;
+      /** ADD PHOTOFILENAME */
+    },
+    creationClick() {
+      axios.post("http://127.0.0.1:8000/product", {
+        ProductName: this.ProductName,
+        ProductDescription: this.ProductDescription,
+        Price: this.ProductPrice,
+        PhotoFileName: "Filler.jpg"
+
+
+      })
+        .then((response) => {
+          this.refreshData();
+          alert(response.data);
+        });
+    },
+    updateClick() {
+      axios.put("http://127.0.0.1:8000/product", {
+        ProductID: this.ProductID,
+        ProductName: this.ProductName,
+        ProductDescription: this.ProductDescription,
+        Price: this.ProductPrice,
+        PhotoFileName: "Filler.jpg"
+
+
+      })
+        .then((response) => {
+          this.refreshData();
+          alert(response.data);
+        });
+
+    },
+    deleteClick(entryID) {
+      if(!confirm("Are you sure you want to delete this product?")){
+        return;
+      }
+      axios.delete("http://127.0.0.1:8000/product/" + entryID)
+        .then((response) => {
+          this.refreshData();
+          alert(response.data);
+        });
     },
     closeForm() {
       this.close();
