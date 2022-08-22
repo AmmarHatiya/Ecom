@@ -53,6 +53,7 @@ def productApi(request, id=0):
         product.delete()
         return JsonResponse("Product Deleted successfully", safe=False)
 
+ 
 @csrf_exempt
 def SaveFile(request):
     file = request.FILES['file']

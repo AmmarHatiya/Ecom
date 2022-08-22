@@ -20,7 +20,10 @@
                   required>
                 </v-text-field>
                 <v-text-field v-model="ProductPrice" :rules="PriceRules" label="Price" required></v-text-field>
-                <v-file-input v-model="ProductPhotoFileName" accept="image/*" label="Picture"></v-file-input>
+
+                <v-img max-height="250" max-width="250" :src="PhotoPath + ProductPhotoFileName"></v-img>
+                <v-file-input @change="imageUpload" accept="image/*" label="Picture">
+                </v-file-input>
               </v-form>
             </v-container>
             <small>All fields are required.</small>
@@ -46,8 +49,9 @@
         Name: {{ prod.ProductName }}
         Price: {{ prod.Price }}
         Description: {{ prod.ProductDescription }}
-        PhotoFileName: {{ prod.PhotoFileName }}
-        .....
+        Photo: {{ prod.PhotoFileName }}
+        <v-img max-height="150" max-width="250" :src="PhotoPath + prod.PhotoFileName"></v-img>
+        
         <v-btn color="blue darken-4" @click="dialog = true, editClick(prod)" rounded v-bind="attrs" v-on="on">
           Edit <v-icon>mdi-pencil-outline</v-icon>
         </v-btn>
@@ -57,28 +61,7 @@
 
       </v-card>
     </v-container>
-    <!-- 
-    <table>
-      <thead>
-        <tr>
-          <th>ProductID</th>
-          <th>ProductName</th>
-          <th>Price</th>
-          <th>Description</th>
-          <th>PhotoFileName</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(prod, index) in products" :key="index">
-          <td>{{prod.ProductID}}</td>
-          <td>{{prod.ProductName}}</td>
-          <td>{{prod.Price}}</td>
-          <td>{{prod.ProductDescription}}</td>
-          <td>{{prod.PhotoFileName}}</td>
-        </tr>
-      </tbody>
-    </table> 
-    -->
+
   </v-main>
 
 </template>
@@ -96,9 +79,9 @@ export default {
     ProductName: "",
     ProductPrice: "",
     ProductDescription: "",
-    ProductPhotoFileName: "",
+    ProductPhotoFileName: "anonymous.png",
     ProductID: 0,
-
+    PhotoPath: "http://127.0.0.1:8000/Photos/",
     dialog: false,
     products: [],
     valid: true,
@@ -131,7 +114,7 @@ export default {
       this.ProductName = "";
       this.ProductDescription = "";
       this.ProductPrice = "";
-      /**ADD PHOTOFILENAME */
+      this.ProductPhotoFileName = "anonymous.png"
 
     },
     editClick(entry) {
@@ -140,14 +123,14 @@ export default {
       this.ProductName = entry.ProductName;
       this.ProductPrice = entry.Price;
       this.ProductDescription = entry.ProductDescription;
-      /** ADD PHOTOFILENAME */
+      this.ProductPhotoFileName = entry.PhotoFileName;
     },
     creationClick() {
       axios.post("http://127.0.0.1:8000/product", {
         ProductName: this.ProductName,
         ProductDescription: this.ProductDescription,
         Price: this.ProductPrice,
-        PhotoFileName: "Filler.jpg"
+        PhotoFileName: this.ProductPhotoFileName
 
 
       })
@@ -162,7 +145,7 @@ export default {
         ProductName: this.ProductName,
         ProductDescription: this.ProductDescription,
         Price: this.ProductPrice,
-        PhotoFileName: "Filler.jpg"
+        PhotoFileName: this.ProductPhotoFileName
 
 
       })
@@ -173,7 +156,7 @@ export default {
 
     },
     deleteClick(entryID) {
-      if(!confirm("Are you sure you want to delete this product?")){
+      if (!confirm("Are you sure you want to delete this product?")) {
         return;
       }
       axios.delete("http://127.0.0.1:8000/product/" + entryID)
@@ -181,6 +164,18 @@ export default {
           this.refreshData();
           alert(response.data);
         });
+    },
+    imageUpload(inst) {
+      let formData = new FormData();
+      formData.append('file', inst.target.files[0]);
+      axios.post(
+        "http://127.0.0.1:8000/" + 'product/savefile',
+        formData
+      ).then((response) => {
+        this.ProductPhotoFileName = response.data;
+
+      });
+
     },
     closeForm() {
       this.close();
