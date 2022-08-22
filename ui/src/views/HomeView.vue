@@ -1,18 +1,17 @@
 <template>
-  <HelloWorld />
+  <ShopCatalogue />
 </template>
 
 <script>
-import { defineComponent } from 'vue';
 
 // Components
-import HelloWorld from '../components/HelloWorld.vue';
+import ShopCatalogue from '../components/ShopCtlg.vue';
 
-export default defineComponent({
+export default ({
   name: 'HomeView',
 
   components: {
-    HelloWorld,
+    ShopCatalogue
   },
 });
 </script>
