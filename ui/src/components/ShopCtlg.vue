@@ -45,49 +45,23 @@
       </v-dialog>
     </v-row>
 
-    <v-container>
-      <h1>SHOP</h1>
-      <h2>There are {{ this.numOfEntries }} entries</h2>
-      <h3> There are {{ this.numOfRows }} rows</h3>
-      <!--
-      <table>
-        <tr v-for="(els, i) in chunkedproducts" :key="i">
-          <td v-for="(prod, j) in chunkedproducts[i]" :key="j">
-            <v-card class="mx-auto" justify="center">
-
-              ID: {{ prod.ProductID }}
-              Name: {{ prod.ProductName }}
-              Price: {{ prod.Price }}
-              Description: {{ prod.ProductDescription }}
-              Photo: {{ prod.PhotoFileName }}
-              <v-img class="mx-auto" max-height="250" max-width="250" :src="PhotoPath + prod.PhotoFileName"></v-img>
-
-              <v-btn color="blue darken-4" @click="dialog = true, editClick(prod)" rounded v-bind="attrs" v-on="on">
-                Edit <v-icon>mdi-pencil-outline</v-icon>
-              </v-btn>
-              <v-btn color="blue darken-4" @click="deleteClick(prod.ProductID)" rounded>
-                Delete <v-icon>mdi-trash-can-outline</v-icon>
-              </v-btn>
-            </v-card>
-          </td>
-        </tr>
-      </table> -->
-      <table>
+    <v-container style="text-align:center">
+      <table class="mx-auto" style="table-layout: fixed; width: 100%; height: 200px; overflow-y: auto;">
       <tr class="mx-auto" justify="center" v-for="(set, index) in format(products) " :key="index">
-        <td class="mx-auto" justify="center" v-for="(prod, i) in format(products)[index] " :key="i">
+        <td justify="center" v-for="(prod, i) in format(products)[index] " :key="i">
+          <v-img class="mx-auto" max-height="250" max-width="250" :src="PhotoPath + prod.PhotoFileName"></v-img>
           ID: {{ prod.ProductID }}
           Name: {{ prod.ProductName }}
           Price: {{ prod.Price }}
           Description: {{ prod.ProductDescription }}
-          Photo: {{ prod.PhotoFileName }}
-          <v-img class="mx-auto" max-height="250" max-width="250" :src="PhotoPath + prod.PhotoFileName"></v-img>
-
+          <v-card>
           <v-btn color="blue darken-4" @click="dialog = true, editClick(prod)" rounded v-bind="attrs" v-on="on">
             Edit <v-icon>mdi-pencil-outline</v-icon>
           </v-btn>
           <v-btn color="blue darken-4" @click="deleteClick(prod.ProductID)" rounded>
             Delete <v-icon>mdi-trash-can-outline</v-icon>
           </v-btn>
+          </v-card>
         </td>
       </tr>
       </table>
