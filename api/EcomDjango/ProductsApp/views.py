@@ -52,7 +52,9 @@ def productApi(request, id=0):
         product = Products.objects.get(ProductID = id)
         product.delete()
         return JsonResponse("Product Deleted successfully", safe=False)
-
+    elif request.method == 'COUNT':
+        num = Products.objects.count()
+        return num
  
 @csrf_exempt
 def SaveFile(request):

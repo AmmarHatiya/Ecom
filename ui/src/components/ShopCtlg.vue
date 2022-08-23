@@ -1,5 +1,8 @@
+
 <template>
   <v-main>
+    <v-text-field hint="Enter the name of the product you're looking for" v-model="ProductSearchTerm"
+      v-on:keyup="FilterStore()" style="padding:1rem; margin-top:1.5rem" label="Search Store"></v-text-field>
     <v-row style="margin-top:1rem" justify="center">
       <v-dialog v-model="dialog" width="unset">
         <template v-slot:activator="{ on, attrs }">
@@ -14,7 +17,7 @@
           <v-card-text>
             <v-container>
               <v-form ref="form" v-model="valid" lazy-validation>
-                <v-text-field v-model="ProductName" :counter="10" :rules="nameRules" label="Name" required>
+                <v-text-field v-model="ProductName" :counter="20" :rules="nameRules" label="Name" required>
                 </v-text-field>
                 <v-text-field v-model="ProductDescription" :rules="descriptionRules" label="Product Description"
                   required>
@@ -44,21 +47,57 @@
 
     <v-container>
       <h1>SHOP</h1>
-      <v-card justify="center" v-for="(prod, index) in products" :key="index">
+      <h2>There are {{ this.numOfEntries }} entries</h2>
+      <h3> There are {{ this.numOfRows }} rows</h3>
+      <!--<table>
+        <tr v-for="(row, i) in this.numOfRows" :key="i">
+          <td v-for="(pro, j) in 3" :key="j">
+          <div v-if="i+1 != this.numOfRows">
+            _{{i}}_
+          </div>
+          <div v-if="(i+1 == this.numOfRows) && (j < this.numOfEntries% 3)">
+            _{{i}}_
+          </div>
+          </td>
+        </tr>
+      </table> -->
+      <table>
+        <tr v-for="(els, i) in chunkedproducts" :key="i">
+          <td v-for="(prod, j) in chunkedproducts[i]" :key="j">
+            <v-card class="mx-auto" justify="center">
+
+              ID: {{ prod.ProductID }}
+              Name: {{ prod.ProductName }}
+              Price: {{ prod.Price }}
+              Description: {{ prod.ProductDescription }}
+              Photo: {{ prod.PhotoFileName }}
+              <v-img class="mx-auto" max-height="250" max-width="250" :src="PhotoPath + prod.PhotoFileName"></v-img>
+
+              <v-btn color="blue darken-4" @click="dialog = true, editClick(prod)" rounded v-bind="attrs" v-on="on">
+                Edit <v-icon>mdi-pencil-outline</v-icon>
+              </v-btn>
+              <v-btn color="blue darken-4" @click="deleteClick(prod.ProductID)" rounded>
+                Delete <v-icon>mdi-trash-can-outline</v-icon>
+              </v-btn>
+            </v-card>
+          </td>
+        </tr>
+      </table>
+      <v-card class="mx-auto" justify="center" v-for="(prod, index) in products" :key="index">
+
         ID: {{ prod.ProductID }}
         Name: {{ prod.ProductName }}
         Price: {{ prod.Price }}
         Description: {{ prod.ProductDescription }}
         Photo: {{ prod.PhotoFileName }}
-        <v-img max-height="150" max-width="250" :src="PhotoPath + prod.PhotoFileName"></v-img>
-        
+        <v-img class="mx-auto" max-height="250" max-width="250" :src="PhotoPath + prod.PhotoFileName"></v-img>
+
         <v-btn color="blue darken-4" @click="dialog = true, editClick(prod)" rounded v-bind="attrs" v-on="on">
           Edit <v-icon>mdi-pencil-outline</v-icon>
         </v-btn>
         <v-btn color="blue darken-4" @click="deleteClick(prod.ProductID)" rounded>
           Delete <v-icon>mdi-trash-can-outline</v-icon>
         </v-btn>
-
       </v-card>
     </v-container>
 
@@ -69,12 +108,16 @@
 <script>
 
 const axios = require('axios').default;
-
+const chunk = require('chunk');
 
 export default {
   name: 'ShopCatalogue',
 
   data: () => ({
+    ProductSearchTerm: "",
+    ProductsNotSearchedFor: [],
+    numOfEntries: 0,
+    numOfRows: 0,
     popupTitle: "",
     ProductName: "",
     ProductPrice: "",
@@ -84,16 +127,18 @@ export default {
     PhotoPath: "http://127.0.0.1:8000/Photos/",
     dialog: false,
     products: [],
+    chunkedproducts: [],
     valid: true,
     name: '',
+    db: [],
     nameRules: [
       v => !!v || 'Name is required',
-      v => (v && v.length <= 10) || 'Name must be less than 10 characters',
+      v => (v && v.length <= 20) || 'Name must be less than 20 characters',
     ],
     description: '',
     descriptionRules: [
       v => !!v || 'Description is required',
-      v => (v && v.length <= 200) || 'Description must be less than 200 characters',
+      v => (v && v.length <= 300) || 'Description must be less than 300 characters',
     ],
     Price: '',
     PriceRules: [
@@ -106,6 +151,7 @@ export default {
       axios.get("http://127.0.0.1:8000/product")
         .then((response) => {
           this.products = response.data;
+          this.ProductsNotSearchedFor = response.data;
         });
     },
     addClick() {
@@ -136,6 +182,9 @@ export default {
       })
         .then((response) => {
           this.refreshData();
+          this.lengthData();
+          this.numRows();
+          this.chunkify();
           alert(response.data);
         });
     },
@@ -151,6 +200,9 @@ export default {
       })
         .then((response) => {
           this.refreshData();
+          this.lengthData();
+          this.numRows();
+          this.chunkify();
           alert(response.data);
         });
 
@@ -162,6 +214,9 @@ export default {
       axios.delete("http://127.0.0.1:8000/product/" + entryID)
         .then((response) => {
           this.refreshData();
+          this.lengthData();
+          this.numRows();
+          this.chunkify();
           alert(response.data);
         });
     },
@@ -179,9 +234,41 @@ export default {
     },
     closeForm() {
       this.close();
+    },
+    lengthData() {
+      axios.get("http://127.0.0.1:8000/product")
+        .then((response) => {
+          this.numOfEntries = response.data.length;
+        });
+    },
+    numRows() {
+      axios.get("http://127.0.0.1:8000/product")
+        .then((response) => {
+          this.numOfRows = Math.floor((response.data.length - 1) / 3) + 1;
+        });
+    },
+    FilterStore() {
+      var ProductNameFilter = this.ProductSearchTerm;
+
+      this.products = this.ProductsNotSearchedFor.filter(
+        function (el) {
+          return el.ProductName.toString().toLowerCase().includes(
+            ProductNameFilter.toString().trim().toLowerCase()
+          )
+        }
+      );
+    },
+    chunkify() {
+      axios.get("http://127.0.0.1:8000/product")
+        .then((response) => {
+          this.chunkedproducts = chunk(response.data, 3)
+        });
     }
   }, mounted: function () {
     this.refreshData();
-  }
+    this.lengthData();
+    this.numRows();
+    this.chunkify();
+  },
 }
 </script>
