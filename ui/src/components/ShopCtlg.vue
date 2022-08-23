@@ -49,18 +49,7 @@
       <h1>SHOP</h1>
       <h2>There are {{ this.numOfEntries }} entries</h2>
       <h3> There are {{ this.numOfRows }} rows</h3>
-      <!--<table>
-        <tr v-for="(row, i) in this.numOfRows" :key="i">
-          <td v-for="(pro, j) in 3" :key="j">
-          <div v-if="i+1 != this.numOfRows">
-            _{{i}}_
-          </div>
-          <div v-if="(i+1 == this.numOfRows) && (j < this.numOfEntries% 3)">
-            _{{i}}_
-          </div>
-          </td>
-        </tr>
-      </table> -->
+      <!--
       <table>
         <tr v-for="(els, i) in chunkedproducts" :key="i">
           <td v-for="(prod, j) in chunkedproducts[i]" :key="j">
@@ -82,23 +71,27 @@
             </v-card>
           </td>
         </tr>
+      </table> -->
+      <table>
+      <tr class="mx-auto" justify="center" v-for="(set, index) in format(products) " :key="index">
+        <td class="mx-auto" justify="center" v-for="(prod, i) in format(products)[index] " :key="i">
+          ID: {{ prod.ProductID }}
+          Name: {{ prod.ProductName }}
+          Price: {{ prod.Price }}
+          Description: {{ prod.ProductDescription }}
+          Photo: {{ prod.PhotoFileName }}
+          <v-img class="mx-auto" max-height="250" max-width="250" :src="PhotoPath + prod.PhotoFileName"></v-img>
+
+          <v-btn color="blue darken-4" @click="dialog = true, editClick(prod)" rounded v-bind="attrs" v-on="on">
+            Edit <v-icon>mdi-pencil-outline</v-icon>
+          </v-btn>
+          <v-btn color="blue darken-4" @click="deleteClick(prod.ProductID)" rounded>
+            Delete <v-icon>mdi-trash-can-outline</v-icon>
+          </v-btn>
+        </td>
+      </tr>
       </table>
-      <v-card class="mx-auto" justify="center" v-for="(prod, index) in products" :key="index">
 
-        ID: {{ prod.ProductID }}
-        Name: {{ prod.ProductName }}
-        Price: {{ prod.Price }}
-        Description: {{ prod.ProductDescription }}
-        Photo: {{ prod.PhotoFileName }}
-        <v-img class="mx-auto" max-height="250" max-width="250" :src="PhotoPath + prod.PhotoFileName"></v-img>
-
-        <v-btn color="blue darken-4" @click="dialog = true, editClick(prod)" rounded v-bind="attrs" v-on="on">
-          Edit <v-icon>mdi-pencil-outline</v-icon>
-        </v-btn>
-        <v-btn color="blue darken-4" @click="deleteClick(prod.ProductID)" rounded>
-          Delete <v-icon>mdi-trash-can-outline</v-icon>
-        </v-btn>
-      </v-card>
     </v-container>
 
   </v-main>
@@ -114,23 +107,32 @@ export default {
   name: 'ShopCatalogue',
 
   data: () => ({
+    // what is typed into search bar
     ProductSearchTerm: "",
+    //items that don't match the search criteria  
     ProductsNotSearchedFor: [],
+    // number of products/entries
     numOfEntries: 0,
+    // how many rows should be displayed
     numOfRows: 0,
+    // Title of card that appears when you add/update a product
     popupTitle: "",
+    // Product specifications
     ProductName: "",
     ProductPrice: "",
     ProductDescription: "",
     ProductPhotoFileName: "anonymous.png",
     ProductID: 0,
     PhotoPath: "http://127.0.0.1:8000/Photos/",
+
+    // to control vue dialog component (show/hide)
     dialog: false,
+    // DB stores in products
     products: [],
     chunkedproducts: [],
     valid: true,
+    // rules for adding/updating products
     name: '',
-    db: [],
     nameRules: [
       v => !!v || 'Name is required',
       v => (v && v.length <= 20) || 'Name must be less than 20 characters',
@@ -146,7 +148,9 @@ export default {
       v => (v && v.length <= 10) || 'Price must be less than 10 characters',
     ]
   }),
+
   methods: {
+    // refresh the DB
     refreshData() {
       axios.get("http://127.0.0.1:8000/product")
         .then((response) => {
@@ -252,17 +256,22 @@ export default {
 
       this.products = this.ProductsNotSearchedFor.filter(
         function (el) {
+
           return el.ProductName.toString().toLowerCase().includes(
             ProductNameFilter.toString().trim().toLowerCase()
           )
         }
+
       );
     },
     chunkify() {
       axios.get("http://127.0.0.1:8000/product")
         .then((response) => {
-          this.chunkedproducts = chunk(response.data, 3)
+          this.chunkedproducts = chunk(response.data, 3);
         });
+    },
+    format(normalList) {
+      return chunk(normalList, 3)
     }
   }, mounted: function () {
     this.refreshData();
