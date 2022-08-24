@@ -1,13 +1,14 @@
 
 <template>
   <v-main>
+
     <v-text-field hint="Enter the name of the product you're looking for" v-model="ProductSearchTerm"
       v-on:keyup="FilterStore()" style="padding:1rem; margin-top:1.5rem" label="Search Store"></v-text-field>
-    <v-row style="margin-top:1rem" justify="center">
+    <v-row style="padding-bottom:1rem; padding-left: 2rem;">
       <v-dialog v-model="dialog" width="unset">
         <template v-slot:activator="{ on, attrs }">
-          <v-btn color="blue darken-4" @click="dialog = true, addClick()" v-bind="attrs" v-on="on">
-            Add Product
+          <v-btn  class="white--text" color="#0D47A1" @click="dialog = true, addClick()" v-bind="attrs" v-on="on">
+          <div color="white">Add Product</div>
           </v-btn>
         </template>
         <v-card width="700px">
@@ -46,24 +47,55 @@
     </v-row>
 
     <v-container style="text-align:center">
-      <table class="mx-auto" style="table-layout: fixed; width: 100%; height: 200px; overflow-y: auto;">
-      <tr class="mx-auto" justify="center" v-for="(set, index) in format(products) " :key="index">
-        <td justify="center" v-for="(prod, i) in format(products)[index] " :key="i">
-          <v-img class="mx-auto" max-height="250" max-width="250" :src="PhotoPath + prod.PhotoFileName"></v-img>
-          ID: {{ prod.ProductID }}
-          Name: {{ prod.ProductName }}
-          Price: {{ prod.Price }}
-          Description: {{ prod.ProductDescription }}
-          <v-card>
-          <v-btn color="blue darken-4" @click="dialog = true, editClick(prod)" rounded v-bind="attrs" v-on="on">
-            Edit <v-icon>mdi-pencil-outline</v-icon>
-          </v-btn>
-          <v-btn color="blue darken-4" @click="deleteClick(prod.ProductID)" rounded>
-            Delete <v-icon>mdi-trash-can-outline</v-icon>
-          </v-btn>
-          </v-card>
-        </td>
-      </tr>
+      <table class="align-content-start" style="table-layout:fixed; width: 100%; overflow: hidden;">
+        <tr justify="center" style="align-items: baseline; height:100%;" v-for="(set, index) in format(products) "
+          :key="index">
+          <td @mouseover="Onhover = true" @mouseleave="Onhover = false"
+            style="width: calc(100%/3); border:4px solid #0D47A1" justify="center"
+            v-for="(prod, i) in format(products)[index] " :key="i">
+
+
+            <v-card class="mx-auto" color="white" max-width="600">
+              <v-img :aspect-ratio="16 / 8" :src="PhotoPath + prod.PhotoFileName">
+              </v-img>
+              <v-card-text class="pt-6" style="position: relative;">
+
+                <h3 class="text-h4 font-weight-light mb-2">
+                  {{ prod.ProductName }}
+                </h3>
+                <div class="font-weight-light text-h6 mb-2">
+                  {{ prod.Price }}
+                </div>
+                <v-btn class="white--text" fab large right absolute color="#0D47A1"
+                  @click="dialog = true, editClick(prod)" rounded v-bind="attrs" v-on="on">
+                  <v-icon color="white">mdi-pencil-outline</v-icon>
+                </v-btn>
+                <v-btn color="#0D47A1" @click="deleteClick(prod.ProductID)" rounded>
+                  <v-icon color="white">mdi-trash-can-outline</v-icon>
+                </v-btn>
+              </v-card-text>
+            </v-card>
+
+
+            <!--
+            <div id="cellcontent" style="height:100%">
+              <v-img class="mx-auto" max-height="250" max-width="250" :src="PhotoPath + prod.PhotoFileName"></v-img>
+              ID: {{ prod.ProductID }}
+              Name: {{ prod.ProductName }}
+              Price: {{ prod.Price }}
+              Description: {{ prod.ProductDescription }}
+              <v-card style=" position:relative; ">
+                <v-btn color="blue darken-4" @click="dialog = true, editClick(prod)" rounded v-bind="attrs" v-on="on">
+                  Edit <v-icon>mdi-pencil-outline</v-icon>
+                </v-btn>
+                <v-btn color="blue darken-4" @click="deleteClick(prod.ProductID)" rounded>
+                  Delete <v-icon>mdi-trash-can-outline</v-icon>
+                </v-btn>
+              </v-card>
+            </div>
+            -->
+          </td>
+        </tr>
       </table>
 
     </v-container>
@@ -101,6 +133,7 @@ export default {
 
     // to control vue dialog component (show/hide)
     dialog: false,
+    Onhover: false,
     // DB stores in products
     products: [],
     chunkedproducts: [],
@@ -255,3 +288,13 @@ export default {
   },
 }
 </script>
+<style >
+.v-card--reveal {
+  align-items: center;
+  bottom: 0;
+  justify-content: center;
+  opacity: .8;
+  position: absolute;
+  width: 100%;
+}
+</style>
