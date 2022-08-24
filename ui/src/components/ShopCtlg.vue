@@ -6,9 +6,9 @@
       v-on:keyup="FilterStore()" style="padding:1rem; margin-top:1.5rem" label="Search Store"></v-text-field>
     <v-row style="padding-bottom:1rem; padding-left: 2rem;">
       <v-dialog v-model="dialog" width="unset">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn  class="white--text" color="#0D47A1" @click="dialog = true, addClick()" v-bind="attrs" v-on="on">
-          <div color="white">Add Product</div>
+        <template  v-slot:activator="{ on, attrs }">
+          <v-btn  style="background-color: #0D47A1; color:white" @click="dialog = true, addClick()" v-bind="attrs" v-on="on">
+          <div>Add Product</div>
           </v-btn>
         </template>
         <v-card width="700px">
@@ -51,7 +51,7 @@
         <tr justify="center" style="align-items: baseline; height:100%;" v-for="(set, index) in format(products) "
           :key="index">
           <td @mouseover="Onhover = true" @mouseleave="Onhover = false"
-            style="width: calc(100%/3); border:4px solid #0D47A1" justify="center"
+            style="width: calc(100%/3); border:3px solid #0D47A1" justify="center"
             v-for="(prod, i) in format(products)[index] " :key="i">
 
 
@@ -66,9 +66,13 @@
                 <div class="font-weight-light text-h6 mb-2">
                   {{ prod.Price }}
                 </div>
-                <v-btn class="white--text" fab large right absolute color="#0D47A1"
+                <v-btn fab large right absolute color="#0D47A1"
                   @click="dialog = true, editClick(prod)" rounded v-bind="attrs" v-on="on">
                   <v-icon color="white">mdi-pencil-outline</v-icon>
+                </v-btn>
+                <v-btn fab large right absolute color="#0D47A1"
+                  @click="dialog = true, editClick(prod)" rounded v-bind="attrs" v-on="on">
+                  <v-icon color="white">mdi-information-outline</v-icon>
                 </v-btn>
                 <v-btn color="#0D47A1" @click="deleteClick(prod.ProductID)" rounded>
                   <v-icon color="white">mdi-trash-can-outline</v-icon>
@@ -152,7 +156,7 @@ export default {
     Price: '',
     PriceRules: [
       v => !!v || 'Price is required',
-      v => (v && v.length <= 10) || 'Price must be less than 10 characters',
+      v => (v && v.length <= 20) || 'Price must be less than 10 characters',
     ]
   }),
 
