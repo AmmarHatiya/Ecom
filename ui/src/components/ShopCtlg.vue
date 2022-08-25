@@ -6,9 +6,10 @@
       v-on:keyup="FilterStore()" style="padding:1rem; margin-top:1.5rem" label="Search Store"></v-text-field>
     <v-row style="padding-bottom:1rem; padding-left: 2rem;">
       <v-dialog v-model="dialog" width="unset">
-        <template  v-slot:activator="{ on, attrs }">
-          <v-btn  style="background-color: #0D47A1; color:white" @click="dialog = true, addClick()" v-bind="attrs" v-on="on">
-          <div>Add Product</div>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn style="background-color: #0D47A1; color:white" @click="dialog = true, addClick()" v-bind="attrs"
+            v-on="on">
+            <div>Add Product</div>
           </v-btn>
         </template>
         <v-card width="700px">
@@ -46,18 +47,27 @@
       </v-dialog>
     </v-row>
 
+
     <v-container style="text-align:center">
       <table class="align-content-start" style="table-layout:fixed; width: 100%; overflow: hidden;">
         <tr justify="center" style="align-items: baseline; height:100%;" v-for="(set, index) in format(products) "
           :key="index">
-          <td @mouseover="Onhover = true" @mouseleave="Onhover = false"
-            style="width: calc(100%/3); border:3px solid #0D47A1" justify="center"
+          <td style="width: calc(100%/3); border:3px solid #0D47A1" justify="center"
             v-for="(prod, i) in format(products)[index] " :key="i">
 
 
             <v-card class="mx-auto" color="white" max-width="600">
-              <v-img :aspect-ratio="16 / 8" :src="PhotoPath + prod.PhotoFileName">
+
+              <v-img style="align-items:flex-end" @mouseover="cartBtn = true, changeActive(prod)" @mouseleave="cartBtn = false, resetActive()"
+                :aspect-ratio="16 / 8" :src="PhotoPath + prod.PhotoFileName">
+                <div style=" position:relative; height:100%;" v-if="cartBtn == true">
+                  <v-btn style="border: solid 2px black; background-color: #0D47A1; color:white" v-if="prod.ProductID == this.tempID" @click="addToCart(prod)">
+                    <v-icon>mdi-cart-plus</v-icon>
+                  </v-btn>
+                </div>
               </v-img>
+
+
               <v-card-text class="pt-6" style="position: relative;">
 
                 <h3 class="text-h4 font-weight-light mb-2">
@@ -66,38 +76,47 @@
                 <div class="font-weight-light text-h6 mb-2">
                   {{ prod.Price }}
                 </div>
-                <v-btn fab large right absolute color="#0D47A1"
-                  @click="dialog = true, editClick(prod)" rounded v-bind="attrs" v-on="on">
+                <v-btn fab large right absolute color="#0D47A1" @click="dialog = true, editClick(prod)" rounded
+                  v-bind="attrs" v-on="on">
                   <v-icon color="white">mdi-pencil-outline</v-icon>
                 </v-btn>
-                <v-btn fab large right absolute color="#0D47A1"
-                  @click="dialog = true, editClick(prod)" rounded v-bind="attrs" v-on="on">
-                  <v-icon color="white">mdi-information-outline</v-icon>
-                </v-btn>
+                <v-dialog v-model="info" width="unset">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn style="background-color: #0D47A1; color:white" @click="info = true, infoClick(prod)"
+                      v-bind="attrs" v-on="on" rounded>
+                      <v-icon color="white">mdi-information-outline</v-icon>
+                    </v-btn>
+                  </template>
+                  <v-card width="700px">
+                    <v-card-title>
+                      <v-img :aspect-ratio="16 / 9" :src="PhotoPath + this.InfoProductPhotoFileName">
+                      </v-img>
+                    </v-card-title>
+                    <v-card-text>
+                      <div justify="center" align="center" class="text-h5 mb-2">{{ this.InfoProductName }}
+                      </div>
+                      <div class="font-weight-light text-h7 mb-2">
+                        <div style="font-weight:bold;">Price (CAD)</div> {{ this.InfoProductPrice }}
+                      </div>
+                      <div class="font-weight-light text-h7 mb-2">
+                        <div style="display:inline-block; font-weight:bold;">ID: </div>
+                        <div style="display:inline-block;"> #{{ this.InfoProductID }}</div>
+                      </div>
+                      <div class="font-weight-light text-h7 mb-2">
+                        <div style="font-weight:bold;">Description</div> {{ this.InfoProductDescription }}
+                      </div>
+
+
+
+                    </v-card-text>
+
+                  </v-card>
+                </v-dialog>
                 <v-btn color="#0D47A1" @click="deleteClick(prod.ProductID)" rounded>
                   <v-icon color="white">mdi-trash-can-outline</v-icon>
                 </v-btn>
               </v-card-text>
             </v-card>
-
-
-            <!--
-            <div id="cellcontent" style="height:100%">
-              <v-img class="mx-auto" max-height="250" max-width="250" :src="PhotoPath + prod.PhotoFileName"></v-img>
-              ID: {{ prod.ProductID }}
-              Name: {{ prod.ProductName }}
-              Price: {{ prod.Price }}
-              Description: {{ prod.ProductDescription }}
-              <v-card style=" position:relative; ">
-                <v-btn color="blue darken-4" @click="dialog = true, editClick(prod)" rounded v-bind="attrs" v-on="on">
-                  Edit <v-icon>mdi-pencil-outline</v-icon>
-                </v-btn>
-                <v-btn color="blue darken-4" @click="deleteClick(prod.ProductID)" rounded>
-                  Delete <v-icon>mdi-trash-can-outline</v-icon>
-                </v-btn>
-              </v-card>
-            </div>
-            -->
           </td>
         </tr>
       </table>
@@ -135,13 +154,29 @@ export default {
     ProductID: 0,
     PhotoPath: "http://127.0.0.1:8000/Photos/",
 
-    // to control vue dialog component (show/hide)
+    InfoProductName: "",
+    InfoProductPrice: "",
+    InfoProductDescription: "",
+    InfoProductPhotoFileName: "anonymous.png",
+    InfoProductID: 0,
+    InfoPhotoPath: "http://127.0.0.1:8000/Photos/",
+
+    // to control vue dialog component for create/update (show/hide)
     dialog: false,
-    Onhover: false,
+    // to control vue dialog comp for more info on product
+    info: false,
+    //to display Add to cart button
+    cartBtn: false,
+    tempID: -1,
     // DB stores in products
     products: [],
     chunkedproducts: [],
+    // cart products
+    cart:[],
+
+    // check if dialog form entries are valid
     valid: true,
+
     // rules for adding/updating products
     name: '',
     nameRules: [
@@ -185,6 +220,13 @@ export default {
       this.ProductPrice = entry.Price;
       this.ProductDescription = entry.ProductDescription;
       this.ProductPhotoFileName = entry.PhotoFileName;
+    },
+    infoClick(entry) {
+      this.InfoProductID = entry.ProductID;
+      this.InfoProductName = entry.ProductName;
+      this.InfoProductPrice = entry.Price;
+      this.InfoProductDescription = entry.ProductDescription;
+      this.InfoProductPhotoFileName = entry.PhotoFileName;
     },
     creationClick() {
       axios.post("http://127.0.0.1:8000/product", {
@@ -262,6 +304,16 @@ export default {
           this.numOfRows = Math.floor((response.data.length - 1) / 3) + 1;
         });
     },
+    changeActive(entry) {
+      this.tempID = entry.ProductID;
+    },
+    resetActive() {
+      this.tempID = -1;
+    },
+    addToCart(entry){
+      this.cart += entry;
+      console.log("cart is:" + this.cart.toString());
+    },
     FilterStore() {
       var ProductNameFilter = this.ProductSearchTerm;
 
@@ -293,12 +345,5 @@ export default {
 }
 </script>
 <style >
-.v-card--reveal {
-  align-items: center;
-  bottom: 0;
-  justify-content: center;
-  opacity: .8;
-  position: absolute;
-  width: 100%;
-}
+
 </style>

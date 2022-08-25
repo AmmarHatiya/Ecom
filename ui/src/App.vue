@@ -8,7 +8,10 @@
         </router-link>
       </v-btn>
 
-      <v-toolbar-title style="color: #0D47A1">Mely.Ai Catalogue</v-toolbar-title>
+      <v-toolbar-title style="color: #0D47A1">
+        <v-img max-height="70" max-width="150" src="@/assets/mely.png"></v-img>
+      
+      </v-toolbar-title>
 
 
       <v-spacer></v-spacer>
