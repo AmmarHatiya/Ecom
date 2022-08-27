@@ -1,10 +1,10 @@
-
 <template>
   <v-main>
-
+    <!-- SEARCH BAR -->
     <v-text-field hint="Enter the name of the product you're looking for" v-model="ProductSearchTerm"
       v-on:keyup="FilterStore()" style="padding:1rem; margin-top:1.5rem" label="Search Store"></v-text-field>
     <v-row style="padding-bottom:1rem; padding-left: 2rem;">
+      <!-- ADD PRODUCT / UPDATE PRODUCT DIALOG -->
       <v-dialog v-model="dialog" width="unset">
         <template v-slot:activator="{ on, attrs }">
           <v-btn style="background-color: #0D47A1; color:white" @click="dialog = true, addClick()" v-bind="attrs"
@@ -47,21 +47,24 @@
       </v-dialog>
     </v-row>
 
-
+    <!-- DISPLAY PRODUCTS CURRENTLY IN DATABASE -->
     <v-container style="text-align:center">
       <table class="align-content-start" style="table-layout:fixed; width: 100%; overflow: hidden;">
-        <tr justify="center" style="align-items: baseline; height:100%;" v-for="(set, index) in format(products) "
+        <tr justify="center" style=" align-items: baseline; height:100%;" v-for="(set, index) in format(products) "
           :key="index">
-          <td style="width: calc(100%/3); border:3px solid #0D47A1" justify="center"
+          <!-- Product -->
+          <td style=" width: calc(100%/3); border:3px solid #0D47A1" justify="center"
             v-for="(prod, i) in format(products)[index] " :key="i">
 
 
             <v-card class="mx-auto" color="white" max-width="600">
 
-              <v-img style="align-items:flex-end" @mouseover="cartBtn = true, changeActive(prod)" @mouseleave="cartBtn = false, resetActive()"
+              <v-img style="border-bottom:solid 1.5px #0D47A1; align-items:flex-end"
+                @mouseover="cartBtn = true, changeActive(prod)" @mouseleave="cartBtn = false, resetActive()"
                 :aspect-ratio="16 / 8" :src="PhotoPath + prod.PhotoFileName">
                 <div style=" position:relative; height:100%;" v-if="cartBtn == true">
-                  <v-btn style="border: solid 2px black; background-color: #0D47A1; color:white" v-if="prod.ProductID == this.tempID" @click="addToCart(prod)">
+                  <v-btn style="border: solid 2px black; background-color: #0D47A1; color:white"
+                    v-if="prod.ProductID == this.tempID" @click="addToCart(prod)">
                     <v-icon>mdi-cart-plus</v-icon>
                   </v-btn>
                 </div>
@@ -71,7 +74,9 @@
               <v-card-text class="pt-6" style="position: relative;">
 
                 <h3 class="text-h4 font-weight-light mb-2">
-                  {{ prod.ProductName }}
+                  <div id="prodName">
+                    {{ prod.ProductName }}
+                  </div>
                 </h3>
                 <div class="font-weight-light text-h6 mb-2">
                   {{ prod.Price }}
@@ -88,6 +93,7 @@
                     </v-btn>
                   </template>
                   <v-card width="700px">
+                    <!-- MORE INFO BUTTON DIALOGUE -->
                     <v-card-title>
                       <v-img :aspect-ratio="16 / 9" :src="PhotoPath + this.InfoProductPhotoFileName">
                       </v-img>
@@ -105,13 +111,10 @@
                       <div class="font-weight-light text-h7 mb-2">
                         <div style="font-weight:bold;">Description</div> {{ this.InfoProductDescription }}
                       </div>
-
-
-
                     </v-card-text>
-
                   </v-card>
                 </v-dialog>
+                <!-- DELETE PRODUCT BUTTON -->
                 <v-btn color="#0D47A1" @click="deleteClick(prod.ProductID)" rounded>
                   <v-icon color="white">mdi-trash-can-outline</v-icon>
                 </v-btn>
@@ -128,8 +131,11 @@
 </template>
 
 <script>
-
+// for http requests
 const axios = require('axios').default;
+
+// to be able to nest arrays within groups of a number
+// i.e Chunk([1,2,3], 1) --> [[1], [2], [3]]
 const chunk = require('chunk');
 
 export default {
@@ -154,6 +160,7 @@ export default {
     ProductID: 0,
     PhotoPath: "http://127.0.0.1:8000/Photos/",
 
+    // Display fields for the detail button 
     InfoProductName: "",
     InfoProductPrice: "",
     InfoProductDescription: "",
@@ -171,9 +178,8 @@ export default {
     // DB stores in products
     products: [],
     chunkedproducts: [],
-    // cart products
-    cart:[],
 
+    cart: [],
     // check if dialog form entries are valid
     valid: true,
 
@@ -204,6 +210,7 @@ export default {
           this.ProductsNotSearchedFor = response.data;
         });
     },
+    // clear the dialog text fields
     addClick() {
       this.popupTitle = "Create a New Product";
       this.ProductID = 0;
@@ -213,21 +220,7 @@ export default {
       this.ProductPhotoFileName = "anonymous.png"
 
     },
-    editClick(entry) {
-      this.popupTitle = "Update Product";
-      this.ProductID = entry.ProductID;
-      this.ProductName = entry.ProductName;
-      this.ProductPrice = entry.Price;
-      this.ProductDescription = entry.ProductDescription;
-      this.ProductPhotoFileName = entry.PhotoFileName;
-    },
-    infoClick(entry) {
-      this.InfoProductID = entry.ProductID;
-      this.InfoProductName = entry.ProductName;
-      this.InfoProductPrice = entry.Price;
-      this.InfoProductDescription = entry.ProductDescription;
-      this.InfoProductPhotoFileName = entry.PhotoFileName;
-    },
+    //perform addition of a product to db
     creationClick() {
       axios.post("http://127.0.0.1:8000/product", {
         ProductName: this.ProductName,
@@ -239,12 +232,20 @@ export default {
       })
         .then((response) => {
           this.refreshData();
-          this.lengthData();
           this.numRows();
-          this.chunkify();
           alert(response.data);
         });
     },
+    // update the update product dialog text fields
+    editClick(entry) {
+      this.popupTitle = "Update Product";
+      this.ProductID = entry.ProductID;
+      this.ProductName = entry.ProductName;
+      this.ProductPrice = entry.Price;
+      this.ProductDescription = entry.ProductDescription;
+      this.ProductPhotoFileName = entry.PhotoFileName;
+    },
+    // map the new updates
     updateClick() {
       axios.put("http://127.0.0.1:8000/product", {
         ProductID: this.ProductID,
@@ -257,13 +258,12 @@ export default {
       })
         .then((response) => {
           this.refreshData();
-          this.lengthData();
           this.numRows();
-          this.chunkify();
           alert(response.data);
         });
 
     },
+    // delete product from db
     deleteClick(entryID) {
       if (!confirm("Are you sure you want to delete this product?")) {
         return;
@@ -271,12 +271,19 @@ export default {
       axios.delete("http://127.0.0.1:8000/product/" + entryID)
         .then((response) => {
           this.refreshData();
-          this.lengthData();
           this.numRows();
-          this.chunkify();
           alert(response.data);
         });
     },
+    // assign the product info divs
+    infoClick(entry) {
+      this.InfoProductID = entry.ProductID;
+      this.InfoProductName = entry.ProductName;
+      this.InfoProductPrice = entry.Price;
+      this.InfoProductDescription = entry.ProductDescription;
+      this.InfoProductPhotoFileName = entry.PhotoFileName;
+    },
+    // upload image to db via ...../product/savefile *see views.py*
     imageUpload(inst) {
       let formData = new FormData();
       formData.append('file', inst.target.files[0]);
@@ -287,36 +294,36 @@ export default {
         this.ProductPhotoFileName = response.data;
 
       });
-
     },
-    closeForm() {
-      this.close();
-    },
+    // For Testing: return length of db
     lengthData() {
       axios.get("http://127.0.0.1:8000/product")
         .then((response) => {
           this.numOfEntries = response.data.length;
         });
     },
+    // For Testing: return how many rows there should be in catalogue
     numRows() {
       axios.get("http://127.0.0.1:8000/product")
         .then((response) => {
           this.numOfRows = Math.floor((response.data.length - 1) / 3) + 1;
         });
     },
+    // change which product's image is being hovered over
     changeActive(entry) {
       this.tempID = entry.ProductID;
     },
+    // reset, so we can repeat for other products
     resetActive() {
       this.tempID = -1;
     },
-    addToCart(entry){
+    // WIP: adds item (entry) to the cart item list
+    addToCart(entry) {
       this.cart += entry;
-      console.log("cart is:" + this.cart.toString());
     },
+    // Filter Product list based off search term
     FilterStore() {
       var ProductNameFilter = this.ProductSearchTerm;
-
       this.products = this.ProductsNotSearchedFor.filter(
         function (el) {
 
@@ -327,23 +334,17 @@ export default {
 
       );
     },
-    chunkify() {
-      axios.get("http://127.0.0.1:8000/product")
-        .then((response) => {
-          this.chunkedproducts = chunk(response.data, 3);
-        });
-    },
+    // Change Data return format, so that it is in groups of 3,
+    // so we can display the catalogue as rows of 3
     format(normalList) {
       return chunk(normalList, 3)
     }
+    // functions that are executed upon page load
   }, mounted: function () {
     this.refreshData();
-    this.lengthData();
     this.numRows();
-    this.chunkify();
   },
 }
 </script>
-<style >
 
-</style>
+
