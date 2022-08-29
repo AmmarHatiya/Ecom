@@ -48,11 +48,12 @@ def productApi(request, id=0):
             products_serializer.save()
             return JsonResponse("Updated Product in DB Successfully", safe = False)
         return JsonResponse("Failed to Update Product", safe = False)
-
+    #Delete 
     elif request.method == 'DELETE':
         product = Products.objects.get(ProductID = id)
         product.delete()
         return JsonResponse("Product Deleted successfully", safe=False)
+    #Testing: COUNT Entries in Database
     elif request.method == 'COUNT':
         num = Products.objects.count()
         return num

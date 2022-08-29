@@ -4,7 +4,7 @@
     <v-text-field hint="Enter the name of the product you're looking for" v-model="ProductSearchTerm"
       v-on:keyup="FilterStore()" style="padding:1rem; margin-top:1.5rem" label="Search Store"></v-text-field>
     <v-row style="padding-bottom:1rem; padding-left: 2rem;">
-      <!-- ADD PRODUCT / UPDATE PRODUCT DIALOG -->
+      <!-- ADD PRODUCT / UPDATE PRODUCT DIALOG (Aka pop up) -->
       <v-dialog v-model="dialog" width="unset">
         <template v-slot:activator="{ on, attrs }">
           <v-btn style="background-color: #0D47A1; color:white" @click="dialog = true, addClick()" v-bind="attrs"
