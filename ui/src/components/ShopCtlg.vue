@@ -85,6 +85,8 @@
                   v-bind="attrs" v-on="on">
                   <v-icon color="white">mdi-pencil-outline</v-icon>
                 </v-btn>
+                
+                <!-- MORE INFO BUTTON DIALOGUE -->
                 <v-dialog v-model="info" width="unset">
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn style="background-color: #0D47A1; color:white" @click="info = true, infoClick(prod)"
@@ -93,7 +95,6 @@
                     </v-btn>
                   </template>
                   <v-card width="700px">
-                    <!-- MORE INFO BUTTON DIALOGUE -->
                     <v-card-title>
                       <v-img :aspect-ratio="16 / 9" :src="PhotoPath + this.InfoProductPhotoFileName">
                       </v-img>

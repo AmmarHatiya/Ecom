@@ -10,7 +10,7 @@
 
       <v-toolbar-title style="color: #0D47A1">
         <v-img max-height="70" max-width="150" src="@/assets/mely.png"></v-img>
-      
+
       </v-toolbar-title>
 
 
@@ -25,7 +25,6 @@
 
     </v-app-bar>
     <router-view />
-
   </v-app>
 </template>
 
