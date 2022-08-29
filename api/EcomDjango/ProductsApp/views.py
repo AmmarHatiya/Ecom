@@ -1,3 +1,4 @@
+#TO BUILD API METHODS
 from django.shortcuts import render
 
 #allow other domains to access api methods
@@ -7,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
-
+# importing created models + serializer classes
 from ProductsApp.models import Products
 from ProductsApp.serializers import ProductSerializer
 
