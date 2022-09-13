@@ -4,10 +4,10 @@ Basic E-Commerce Web App with Python (Django) using SQLite3 DB, and Vuejs (with 
 
 ## How to run (in this order)
 ### Server Side (running on localhost:3000)
-This is for the database (mongoose)
+This is for the database (Django, SQLite3 DB)
 ```
-cd src/server-side
-node server.js
+cd .\api\EcomDjango\
+python .\manage.py runserver
 ```
 
 ### Client Side
