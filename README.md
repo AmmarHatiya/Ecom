@@ -16,8 +16,8 @@ npm install
 npm run serve
 ```
 
-### Home View:
+### Product Catalogue View:
 ![image](https://user-images.githubusercontent.com/45467347/190016768-770c0b3e-6b87-427d-90b2-265448c9856f.png)
 
-### Product Details View
+### Product Details View:
 ![image](https://user-images.githubusercontent.com/45467347/190017094-7dddf481-4a21-4e46-92da-a5e33839d345.png)
