@@ -1,7 +1,8 @@
 # Ecom
-Basic E-Commerce SPA built with Python (Django) using SQLite3 DB, and Vuejs (with Vuetify). 
+E-Commerce SPA (single page application) built with Python (Django) using SQLite3 DB, and Vuejs (with Vuetify). 
 Filter the product catalogue using the search bar, and find more information on a product
-by clicking the Product Details button. 
+by clicking the Product Details button. Add product to cart by hovering over image 
+and then clicking the Add To Cart button.
 
 ## How to run (in this order)
 ### Server Side (running on localhost:8000)
