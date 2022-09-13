@@ -21,3 +21,6 @@ npm run serve
 
 ### Product Details View:
 ![image](https://user-images.githubusercontent.com/45467347/190017094-7dddf481-4a21-4e46-92da-a5e33839d345.png)
+
+### Search Results View:
+![image](https://user-images.githubusercontent.com/45467347/190017344-5fcb67e1-5420-4dab-a3a4-65d72548715b.png)
